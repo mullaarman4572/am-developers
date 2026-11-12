@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Inquiries | AM Developers Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25 gap-3">
+    <div>
+      <span class="badge-pill-cyan mb-1">CLIENT LEADS</span>
+      <h2 class="text-white fw-bold mb-0">Customer Inquiries ({{ inquiries|length }})</h2>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-glow btn-sm">
+        <i class="bi bi-speedometer2 me-1"></i> Dashboard
+      </a>
+      <a href="{{ url_for('admin_projects') }}" class="btn btn-outline-glow btn-sm">
+        <i class="bi bi-folder-fill me-1"></i> Projects
+      </a>
+    </div>
+  </div>
+
+  <!-- Status Filter Tabs -->
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{{ url_for('admin_inquiries', status='All') }}" class="btn btn-sm {% if current_status == 'All' %}btn-gradient{% else %}btn-outline-glow{% endif %}">
+      All ({{ stats.total }})
+    </a>
+    <a href="{{ url_for('admin_inquiries', status='New') }}" class="btn btn-sm {% if current_status == 'New' %}btn-gradient{% else %}btn-outline-glow text-danger{% endif %}">
+      New ({{ stats.new }})
+    </a>
+    <a href="{{ url_for('admin_inquiries', status='Contacted') }}" class="btn btn-sm {% if current_status == 'Contacted' %}btn-gradient{% else %}btn-outline-glow text-warning{% endif %}">
+      Contacted ({{ stats.contacted }})
+    </a>
+    <a href="{{ url_for('admin_inquiries', status='Converted') }}" class="btn btn-sm {% if current_status == 'Converted' %}btn-gradient{% else %}btn-outline-glow text-success{% endif %}">
+      Converted ({{ stats.converted }})
+    </a>
+    <a href="{{ url_for('admin_inquiries', status='Closed') }}" class="btn btn-sm {% if current_status == 'Closed' %}btn-gradient{% else %}btn-outline-glow text-muted{% endif %}">
+      Closed
+    </a>
+  </div>
+
+  <!-- Inquiries List -->
+  <div class="glass-card p-4">
+    <div class="table-responsive">
+      <table class="table table-dark table-borderless align-middle mb-0" style="background: transparent;">
+        <thead>
+          <tr class="border-bottom border-secondary border-opacity-25 small text-muted">
+            <th>ID &amp; DATE</th>
+            <th>CLIENT INFO</th>
+            <th>REQUIREMENTS</th>
+            <th>SOURCE</th>
+            <th>UPDATE STATUS</th>
+            <th class="text-end">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody class="small">
+          {% for inq in inquiries %}
+          <tr class="border-bottom border-secondary border-opacity-10">
+            <td>
+              <span class="text-muted fw-bold">#{{ inq.id }}</span>
+              <div class="text-secondary small">{{ inq.created_at[:16] }}</div>
+            </td>
+            <td>
+              <div class="text-white fw-bold">{{ inq.name }}</div>
+              <div><a href="tel:{{ inq.phone }}" class="text-cyan text-decoration-none"><i class="bi bi-telephone-fill me-1"></i>{{ inq.phone }}</a></div>
+              {% if inq.email %}<div class="text-muted small"><i class="bi bi-envelope me-1"></i>{{ inq.email }}</div>{% endif %}
+            </td>
+            <td style="max-width: 320px;">
+              <div class="text-white fw-semibold">{{ inq.service or 'Web Development' }}</div>
+              <div class="text-purple small fw-bold mb-1">Budget: {{ inq.budget or 'Flexible' }}</div>
+              {% if inq.message %}
+                <div class="p-2 rounded bg-dark bg-opacity-75 border border-secondary border-opacity-25 small text-muted">
+                  {{ inq.message }}
+                </div>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge bg-secondary text-light">{{ inq.source or 'Contact Form' }}</span>
+            </td>
+            <td>
+              <form action="{{ url_for('admin_update_inquiry_status', inquiry_id=inq.id) }}" method="POST" class="d-inline">
+                <select name="status" class="form-select form-select-sm form-select-custom" onchange="this.form.submit()" style="width: 130px;">
+                  <option value="New" {% if inq.status == 'New' %}selected{% endif %}>🔴 New</option>
+                  <option value="Contacted" {% if inq.status == 'Contacted' %}selected{% endif %}>🟡 Contacted</option>
+                  <option value="Converted" {% if inq.status == 'Converted' %}selected{% endif %}>🟢 Converted</option>
+                  <option value="Closed" {% if inq.status == 'Closed' %}selected{% endif %}>⚪ Closed</option>
+                </select>
+              </form>
+            </td>
+            <td class="text-end">
+              <div class="d-flex justify-content-end gap-2">
+                <a href="https://wa.me/91{{ inq.phone }}?text=Hello%20{{ inq.name }},%20this%20is%20AM%20Developers%20following%20up%20on%20your%20inquiry%20for%20{{ inq.service }}!%20When%20would%20be%20a%20good%20time%20to%20discuss?" target="_blank" class="btn btn-sm btn-whatsapp" title="Message on WhatsApp">
+                  <i class="bi bi-whatsapp"></i> Chat
+                </a>
+                <form action="{{ url_for('admin_delete_inquiry', inquiry_id=inq.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete inquiry #{{ inq.id }}?');">
+                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Inquiry">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-5">
+              <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+              No inquiries found under status: <strong>{{ current_status }}</strong>.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

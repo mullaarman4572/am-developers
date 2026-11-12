@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Console Login | AM Developers{% endblock %}
+
+{% block content %}
+<section class="py-5 d-flex align-items-center" style="min-height: 75vh;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="glass-card p-4 p-md-5" style="border-color: var(--cyan-primary); box-shadow: var(--shadow-glow-cyan);">
+          
+          <div class="text-center mb-4">
+            <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="AM Developers Logo" style="height: 54px;" class="mb-3">
+            <h4 class="text-white fw-bold mb-1">Admin Console</h4>
+            <p class="small text-muted mb-0">Sign in to manage client inquiries &amp; portfolio projects.</p>
+          </div>
+
+          <form action="{{ url_for('admin_login') }}" method="POST">
+            <div class="mb-3">
+              <label class="form-label-custom">Username</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary border-opacity-25 text-muted">
+                  <i class="bi bi-person-fill"></i>
+                </span>
+                <input type="text" name="username" class="form-control form-control-custom" placeholder="admin" value="admin" required>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label-custom">Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary border-opacity-25 text-muted">
+                  <i class="bi bi-lock-fill"></i>
+                </span>
+                <input type="password" name="password" class="form-control form-control-custom" placeholder="••••••••" value="amdevs@2026" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-gradient w-100 justify-content-center py-2 mb-3">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Dashboard
+            </button>
+
+            <div class="p-3 rounded bg-dark bg-opacity-75 border border-secondary border-opacity-25 small text-center text-muted">
+              <i class="bi bi-info-circle text-cyan me-1"></i> Default credentials: 
+              <br><code class="text-cyan">admin</code> / <code class="text-purple">amdevs@2026</code>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

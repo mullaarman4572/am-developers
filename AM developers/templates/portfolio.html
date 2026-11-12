@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Our Portfolio | AM Developers - Star Bakery, Evolve Fitness, QR Generator & More{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 text-center position-relative">
+  <div class="container py-4">
+    <span class="section-badge badge-pill-cyan mb-3">OUR CLIENT WORK</span>
+    <h1 class="text-white fw-black display-5 mb-3">Crafted with Precision &amp; Modern Aesthetics</h1>
+    <p class="text-muted fs-5 mx-auto" style="max-width: 680px;">
+      Explore live and completed projects built by AM Developers. Every site is custom-engineered for mobile responsiveness, high speed, and customer conversion.
+    </p>
+  </div>
+</section>
+
+<!-- Filter Buttons & Portfolio Grid -->
+<section class="pb-5">
+  <div class="container">
+    
+    <!-- Filter Navigation Tabs -->
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+      <button class="btn btn-gradient portfolio-filter-btn active" data-filter="all">
+        <i class="bi bi-grid-fill me-1"></i> All Projects
+      </button>
+      <button class="btn btn-outline-glow portfolio-filter-btn" data-filter="Business">
+        <i class="bi bi-briefcase-fill me-1"></i> Business Websites
+      </button>
+      <button class="btn btn-outline-glow portfolio-filter-btn" data-filter="E-Commerce">
+        <i class="bi bi-bag-check-fill me-1"></i> E-Commerce Stores
+      </button>
+      <button class="btn btn-outline-glow portfolio-filter-btn" data-filter="Web App">
+        <i class="bi bi-code-square me-1"></i> Web Applications
+      </button>
+    </div>
+
+    <!-- Project Cards Grid -->
+    <div class="row g-4" id="portfolioGrid">
+      {% for project in projects %}
+      <div class="col-lg-4 col-md-6 portfolio-grid-item" data-category="{{ project.category }}">
+        <div class="glass-card portfolio-card">
+          <div class="portfolio-img-box">
+            <img src="{{ project.image_url }}" alt="{{ project.title }}">
+            <div class="portfolio-overlay">
+              <a href="{{ project.live_url }}" target="_blank" class="btn btn-gradient btn-sm">
+                <i class="bi bi-whatsapp"></i> Chat About This Project
+              </a>
+            </div>
+          </div>
+          <div class="portfolio-body">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge-pill-purple py-1 px-2" style="font-size: 0.72rem;">{{ project.category }}</span>
+                <span class="small text-muted">{{ project.client }}</span>
+              </div>
+              <h4 class="text-white fw-bold mb-1">{{ project.title }}</h4>
+              {% if project.subtitle %}
+                <div class="small text-cyan mb-2 fw-medium">{{ project.subtitle }}</div>
+              {% endif %}
+              <p class="small text-muted mb-3">{{ project.description }}</p>
+            </div>
+            <div>
+              <div class="mb-3">
+                {% for tag in project.tags.split(',') %}
+                  <span class="portfolio-tag">{{ tag.strip() }}</span>
+                {% endfor %}
+              </div>
+              <div class="d-flex gap-2">
+                <a href="{{ project.live_url }}" target="_blank" class="btn btn-outline-glow btn-sm w-100 text-center">
+                  <i class="bi bi-whatsapp text-success me-1"></i> Inquire Like This
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="py-5 text-center" style="background: rgba(10, 15, 36, 0.6);">
+  <div class="container">
+    <div class="glass-card p-5" style="max-width: 800px; margin: 0 auto;">
+      <h3 class="text-white fw-bold mb-2">Have a Unique Website Vision?</h3>
+      <p class="text-muted mb-4">
+        We can build a tailored solution specifically for your industry or niche. Reach out directly to our founders at <strong>8971987220</strong> or <strong>7821964008</strong>.
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('contact') }}" class="btn btn-gradient px-4">Start Your Project</a>
+        <a href="{{ url_for('pricing') }}" class="btn btn-outline-glow px-4">View Pricing Plans</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

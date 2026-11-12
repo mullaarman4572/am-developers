@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Portfolio Projects | AM Developers Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25 gap-3">
+    <div>
+      <span class="badge-pill-cyan mb-1">PORTFOLIO CMS</span>
+      <h2 class="text-white fw-bold mb-0">Manage Portfolio Projects ({{ projects|length }})</h2>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn btn-gradient btn-sm" data-bs-toggle="collapse" data-bs-target="#addProjectCollapse">
+        <i class="bi bi-plus-circle-fill me-1"></i> Add New Project
+      </button>
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-glow btn-sm">
+        <i class="bi bi-speedometer2 me-1"></i> Dashboard
+      </a>
+      <a href="{{ url_for('portfolio') }}" target="_blank" class="btn btn-outline-glow btn-sm">
+        <i class="bi bi-box-arrow-up-right me-1"></i> Public Portfolio
+      </a>
+    </div>
+  </div>
+
+  <!-- Collapsible Add Project Form -->
+  <div class="collapse mb-4" id="addProjectCollapse">
+    <div class="glass-card p-4 p-md-5" style="border-color: var(--cyan-primary);">
+      <h4 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+        <i class="bi bi-plus-square-fill text-cyan"></i> Add New Project to Portfolio
+      </h4>
+      <form action="{{ url_for('admin_projects') }}" method="POST">
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label-custom">Project Title *</label>
+            <input type="text" name="title" class="form-control form-control-custom" placeholder="e.g. Royal Sweets Online" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-custom">Category *</label>
+            <select name="category" class="form-select form-select-custom" required>
+              <option value="Business">Business Website</option>
+              <option value="E-Commerce">E-Commerce Store</option>
+              <option value="Web App">Web Application</option>
+              <option value="Portfolio">Portfolio Website</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-custom">Client Name</label>
+            <input type="text" name="client" class="form-control form-control-custom" placeholder="e.g. Royal Confectionery">
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label-custom">Subtitle / Short Punchline</label>
+            <input type="text" name="subtitle" class="form-control form-control-custom" placeholder="e.g. Traditional Artisan Sweets &amp; Delivery">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label-custom">Tags (comma separated)</label>
+            <input type="text" name="tags" class="form-control form-control-custom" placeholder="E-Commerce, WhatsApp Ordering, Fast Load">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label-custom">Detailed Description *</label>
+          <textarea name="description" rows="3" class="form-control form-control-custom" placeholder="Describe the project features, value delivered to the client, and tech used..." required></textarea>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label-custom">Mockup / Image URL</label>
+            <input type="text" name="image_url" class="form-control form-control-custom" value="/static/images/project-star-bakery.svg">
+            <div class="form-text text-muted small">Choose from: /static/images/project-star-bakery.svg, project-evolve-fitness.svg, project-qr-generator.svg, project-nexus-tech.svg, project-urban-bistro.svg, project-swift-deliver.svg</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label-custom">Live URL or WhatsApp Demo Link</label>
+            <input type="text" name="live_url" class="form-control form-control-custom" placeholder="https://wa.me/918971987220?text=Hi%20AM%20Developers">
+          </div>
+        </div>
+
+        <div class="form-check form-switch mb-4">
+          <input class="form-check-input" type="checkbox" name="featured" id="featuredCheck" value="1" checked>
+          <label class="form-check-label text-white small" for="featuredCheck">Feature this project on the homepage showcase</label>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-gradient px-4">
+            <i class="bi bi-check-lg me-1"></i> Save &amp; Publish Project
+          </button>
+          <button type="button" class="btn btn-outline-secondary px-4 text-light" data-bs-toggle="collapse" data-bs-target="#addProjectCollapse">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  <div class="row g-4">
+    {% for proj in projects %}
+    <div class="col-lg-6">
+      <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex gap-3 mb-3">
+            <img src="{{ proj.image_url }}" alt="{{ proj.title }}" style="width: 140px; height: 95px; object-fit: cover; border-radius: 8px;" class="border border-secondary border-opacity-25">
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-start">
+                <span class="badge-pill-purple py-0 px-2" style="font-size: 0.7rem;">{{ proj.category }}</span>
+                {% if proj.featured %}
+                  <span class="badge bg-success" style="font-size: 0.7rem;">Featured</span>
+                {% endif %}
+              </div>
+              <h5 class="text-white fw-bold mt-1 mb-0">{{ proj.title }}</h5>
+              <div class="small text-cyan">{{ proj.client or 'Client Showcase' }}</div>
+              <div class="small text-muted">{{ proj.subtitle }}</div>
+            </div>
+          </div>
+
+          <p class="small text-muted mb-3">{{ proj.description }}</p>
+
+          <div class="mb-3">
+            {% for tag in proj.tags.split(',') %}
+              <span class="portfolio-tag">{{ tag.strip() }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+          <a href="{{ proj.live_url }}" target="_blank" class="small text-cyan text-decoration-none">
+            <i class="bi bi-link-45deg"></i> Test Link
+          </a>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-glow" data-bs-toggle="modal" data-bs-target="#editModal{{ proj.id }}">
+              <i class="bi bi-pencil-fill me-1"></i> Edit
+            </button>
+            <form action="{{ url_for('admin_delete_project', project_id=proj.id) }}" method="POST" onsubmit="return confirm('Delete project: {{ proj.title }}?');">
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Edit Modal for Project -->
+    <div class="modal fade" id="editModal{{ proj.id }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-card border border-secondary text-light">
+          <div class="modal-header border-bottom border-secondary border-opacity-25">
+            <h5 class="modal-title fw-bold text-white">Edit Project #{{ proj.id }}: {{ proj.title }}</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <form action="{{ url_for('admin_edit_project', project_id=proj.id) }}" method="POST">
+            <div class="modal-body p-4">
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label-custom">Title</label>
+                  <input type="text" name="title" class="form-control form-control-custom" value="{{ proj.title }}" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label-custom">Category</label>
+                  <select name="category" class="form-select form-select-custom">
+                    <option value="Business" {% if proj.category == 'Business' %}selected{% endif %}>Business</option>
+                    <option value="E-Commerce" {% if proj.category == 'E-Commerce' %}selected{% endif %}>E-Commerce</option>
+                    <option value="Web App" {% if proj.category == 'Web App' %}selected{% endif %}>Web App</option>
+                    <option value="Portfolio" {% if proj.category == 'Portfolio' %}selected{% endif %}>Portfolio</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label-custom">Client</label>
+                  <input type="text" name="client" class="form-control form-control-custom" value="{{ proj.client }}">
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label-custom">Subtitle</label>
+                  <input type="text" name="subtitle" class="form-control form-control-custom" value="{{ proj.subtitle }}">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Tags</label>
+                  <input type="text" name="tags" class="form-control form-control-custom" value="{{ proj.tags }}">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-custom">Description</label>
+                <textarea name="description" rows="3" class="form-control form-control-custom" required>{{ proj.description }}</textarea>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label-custom">Image URL</label>
+                  <input type="text" name="image_url" class="form-control form-control-custom" value="{{ proj.image_url }}">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-custom">Live URL</label>
+                  <input type="text" name="live_url" class="form-control form-control-custom" value="{{ proj.live_url }}">
+                </div>
+              </div>
+
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="featured" id="editFeatured{{ proj.id }}" value="1" {% if proj.featured %}checked{% endif %}>
+                <label class="form-check-label text-white small" for="editFeatured{{ proj.id }}">Feature on Homepage</label>
+              </div>
+            </div>
+            <div class="modal-footer border-top border-secondary border-opacity-25">
+              <button type="button" class="btn btn-outline-secondary text-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-gradient btn-sm">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}
