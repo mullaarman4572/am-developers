@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}About Us | AM Developers - Modern Web Agency{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 text-center position-relative">
+  <div class="container py-4">
+    <span class="section-badge badge-pill-cyan mb-3">ABOUT AM DEVELOPERS</span>
+    <h1 class="text-white fw-black display-5 mb-3">Building Modern, Affordable Websites for Growing Businesses</h1>
+    <p class="text-muted fs-5 mx-auto" style="max-width: 680px;">
+      We bridge the gap between expensive legacy web agencies and subpar website builders. You get custom, high-speed, modern websites crafted by dedicated developers.
+    </p>
+  </div>
+</section>
+
+<!-- Company Story & Mission -->
+<section class="pb-5">
+  <div class="container">
+    <div class="row g-5 align-items-center mb-5">
+      <div class="col-lg-6">
+        <span class="badge-pill-purple mb-3">OUR ORIGIN &amp; MISSION</span>
+        <h2 class="text-white fw-bold mb-4">Why We Started AM Developers</h2>
+        <p class="text-muted mb-3">
+          Most traditional digital marketing and development agencies charge ₹25,000 to ₹50,000 for a basic website, take weeks to deliver, and hide behind account managers.
+        </p>
+        <p class="text-muted mb-3">
+          On the other hand, generic DIY template builders produce slow, bloated websites that fail to rank on Google or convert mobile visitors.
+        </p>
+        <p class="text-white fw-semibold mb-4">
+          At <strong>AM Developers</strong>, we do things differently:
+        </p>
+        
+        <div class="d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <div class="bg-cyan bg-opacity-10 text-cyan rounded-circle p-2 mt-1">
+              <i class="bi bi-tag-fill"></i>
+            </div>
+            <div>
+              <div class="text-white fw-bold">Affordable Transparency (Starts at ₹2,999)</div>
+              <div class="small text-muted">Clear milestone pricing with zero hidden maintenance fees or surprise bills.</div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3">
+            <div class="bg-purple bg-opacity-10 text-purple rounded-circle p-2 mt-1">
+              <i class="bi bi-lightning-charge-fill"></i>
+            </div>
+            <div>
+              <div class="text-white fw-bold">Rapid 3 to 5 Day Turnaround</div>
+              <div class="small text-muted">Your business needs a live website now, not months from now. We work fast without sacrificing quality.</div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3">
+            <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 mt-1">
+              <i class="bi bi-whatsapp"></i>
+            </div>
+            <div>
+              <div class="text-white fw-bold">Direct Founder Access (8971987220 &amp; 7821964008)</div>
+              <div class="small text-muted">You speak directly with the engineers building your site. Fast answers, zero bureaucratic delays.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-lg-6">
+        <div class="glass-card p-4 p-md-5 text-center">
+          <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="AM Developers Logo" style="height: 60px;" class="mb-4">
+          <h4 class="text-white fw-bold mb-2">AM Developers Tech Stack</h4>
+          <p class="small text-muted mb-4">Engineered with high-performance, robust, and scalable technologies:</p>
+          
+          <div class="row g-3 text-start">
+            <div class="col-6">
+              <div class="p-3 rounded bg-dark bg-opacity-60 border border-secondary border-opacity-25">
+                <div class="text-cyan fw-bold mb-1"><i class="bi bi-filetype-py"></i> Python Flask</div>
+                <div class="small text-muted">Lightweight, lightning fast backend framework.</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded bg-dark bg-opacity-60 border border-secondary border-opacity-25">
+                <div class="text-purple fw-bold mb-1"><i class="bi bi-database"></i> SQLite / SQL</div>
+                <div class="small text-muted">Zero-latency embedded customer data storage.</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded bg-dark bg-opacity-60 border border-secondary border-opacity-25">
+                <div class="text-cyan fw-bold mb-1"><i class="bi bi-bootstrap-fill"></i> Bootstrap 5 &amp; CSS</div>
+                <div class="small text-muted">Fluid mobile-first responsive grid &amp; dark UI.</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded bg-dark bg-opacity-60 border border-secondary border-opacity-25">
+                <div class="text-success fw-bold mb-1"><i class="bi bi-whatsapp"></i> WhatsApp Cloud</div>
+                <div class="small text-muted">Instant customer lead routing &amp; notification.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <a href="{{ url_for('portfolio') }}" class="btn btn-gradient w-100 justify-content-center">
+              Explore Our Portfolio Work
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Founders & Leadership Strip -->
+    <div class="glass-card p-4 p-md-5">
+      <div class="text-center mb-4">
+        <span class="badge-pill-cyan mb-2">OUR LEADERSHIP</span>
+        <h3 class="text-white fw-bold">Meet the Founders of AM Developers</h3>
+        <p class="text-muted small">Passionate about empowering small and mid-sized businesses with enterprise-grade web presences.</p>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        <!-- Founder 1 -->
+        <div class="col-md-5">
+          <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 text-center">
+            <div class="testimonial-avatar mx-auto mb-3" style="width: 70px; height: 70px; font-size: 1.6rem;">AM</div>
+            <h5 class="text-white fw-bold mb-1">Founder &amp; Technical Director</h5>
+            <div class="text-cyan small mb-3">AM Developers Technical Lead</div>
+            <p class="small text-muted mb-3">
+              Full-stack developer specializing in Python, Flask architectures, database design, and mobile-first responsive frontend systems.
+            </p>
+            <div class="d-flex justify-content-center gap-2">
+              <a href="tel:8971987220" class="btn btn-sm btn-outline-glow">
+                <i class="bi bi-telephone-fill text-cyan me-1"></i> 8971987220
+              </a>
+              <a href="https://wa.me/918971987220" target="_blank" class="btn btn-sm btn-whatsapp">
+                <i class="bi bi-whatsapp"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Founder 2 -->
+        <div class="col-md-5">
+          <div class="p-4 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 text-center">
+            <div class="testimonial-avatar mx-auto mb-3" style="width: 70px; height: 70px; font-size: 1.6rem; background: linear-gradient(135deg, #7928ca, #ec4899);">AM</div>
+            <h5 class="text-white fw-bold mb-1">Co-Founder &amp; Client Success</h5>
+            <div class="text-purple small mb-3">AM Developers Strategy &amp; Growth</div>
+            <p class="small text-muted mb-3">
+              Specialist in client relations, requirement scoping, UI/UX aesthetics, and digital marketing conversion funnels.
+            </p>
+            <div class="d-flex justify-content-center gap-2">
+              <a href="tel:7821964008" class="btn btn-sm btn-outline-glow">
+                <i class="bi bi-telephone-fill text-purple me-1"></i> 7821964008
+              </a>
+              <a href="https://wa.me/917821964008" target="_blank" class="btn btn-sm btn-whatsapp">
+                <i class="bi bi-whatsapp"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

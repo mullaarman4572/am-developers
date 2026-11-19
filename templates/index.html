@@ -1,0 +1,966 @@
+{% extends "base.html" %}
+
+{% block title %}AM Developers | Modern Web Development Agency - Websites from ₹2,999{% endblock %}
+
+{% block content %}
+
+<!-- =================================================================
+     01. HERO SECTION
+     ================================================================= -->
+<section class="hero-section position-relative overflow-hidden">
+  <div class="container position-relative" style="z-index: 2;">
+    <div class="row align-items-center g-5">
+      
+      <!-- Left Column: Copy & CTAs -->
+      <div class="col-lg-6 text-center text-lg-start">
+        
+        <div class="d-inline-flex align-items-center gap-2 mb-3">
+          <span class="badge-pill-cyan">
+            <span class="pulse-dot"></span> TOP-RATED WEB AGENCY
+          </span>
+          <span class="badge-pill-purple">
+            <i class="bi bi-tag-fill"></i> Packages from ₹2,999
+          </span>
+        </div>
+
+        <h1 class="hero-headline text-white mb-4">
+          Turn Your Ideas into a <span class="text-gradient">Modern Website</span> That Brings New Clients.
+        </h1>
+
+        <p class="text-muted fs-5 mb-4 pe-lg-4">
+          We build stunning, ultra-fast, and mobile-friendly websites for growing businesses, startups, and stores. Delivered in just <strong>3 to 5 days</strong> with zero hidden fees and direct WhatsApp support.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 mb-4">
+          <a href="#pricingSection" class="btn btn-gradient">
+            <i class="bi bi-rocket-takeoff-fill"></i> Get Started
+          </a>
+          <a href="#portfolioSection" class="btn btn-outline-glow">
+            <i class="bi bi-folder-check"></i> View Our Work
+          </a>
+          <a href="#calculatorSection" class="btn btn-outline-glow text-cyan">
+            <i class="bi bi-calculator"></i> Cost Calculator
+          </a>
+        </div>
+
+
+
+      </div>
+
+      <!-- Right Column: High-Tech 360° Synced Mockup Preview -->
+      <div class="col-lg-6">
+        <div class="hero-mockup-wrapper text-center position-relative" id="heroMockupContainer">
+          
+          <!-- Outer Ambient Glow -->
+          <div class="position-absolute top-50 start-50 translate-middle w-100 h-100" style="background: radial-gradient(circle, rgba(0, 242, 254, 0.22) 0%, rgba(139, 92, 246, 0.18) 45%, transparent 70%); filter: blur(50px); z-index: 0; pointer-events: none;"></div>
+
+          <!-- Main 360 Interactive Device Showcase Card -->
+          <div class="mockup-360-card border border-secondary border-opacity-50 position-relative overflow-hidden" id="mockupCard">
+            
+            <!-- Three.js 3D Interactive Canvas Viewport (Default: 360° Drag & Auto-Spin) -->
+            <div id="mockup3DContainer" class="mockup-3d-viewport position-relative">
+              <canvas id="mockup3DCanvas" class="w-100 h-100 d-block"></canvas>
+            </div>
+
+            <!-- HD Photo View Mode (Toggled via button) -->
+            <div id="mockupPhotoContainer" class="mockup-photo-viewport position-relative d-none">
+              <div class="mockup-tilt-wrapper p-2">
+                <img src="{{ url_for('static', filename='images/hero-mockup-3d.jpg') }}" alt="AM Developers Laptop & Mobile Mockup" id="mockupTiltImg" class="hero-mockup-img img-fluid rounded-4" style="width: 100%; height: auto; display: block; object-fit: cover;">
+                <div class="mockup-sheen-highlight"></div>
+              </div>
+            </div>
+
+            <!-- Floating Top Badges -->
+            <div class="position-absolute top-0 start-0 m-3 d-flex align-items-center gap-2 z-2">
+              <div class="px-3 py-1 rounded-pill glass-badge d-flex align-items-center gap-2 border border-cyan border-opacity-50 shadow-sm">
+                <span class="pulse-dot" style="background: #10b981;"></span>
+                <span class="small text-white fw-bold" style="font-size: 0.76rem;">⚡ 99+ Performance</span>
+              </div>
+            </div>
+
+            <div class="position-absolute top-0 end-0 m-3 d-flex align-items-center gap-2 z-2">
+              <div class="px-3 py-1 rounded-pill glass-badge d-flex align-items-center gap-2 border border-purple border-opacity-50 shadow-sm">
+                <i class="bi bi-arrow-repeat text-cyan spin-slow" id="badgeSpinIcon"></i>
+                <span class="small text-white fw-bold" style="font-size: 0.76rem;">360° Interactive</span>
+              </div>
+            </div>
+
+            <!-- Floating Bottom-Left Synced Indicator -->
+            <div class="position-absolute bottom-0 start-0 m-3 d-none d-sm-flex align-items-center gap-2 z-2">
+              <div class="px-3 py-1 rounded-pill glass-badge d-flex align-items-center gap-2 border border-cyan border-opacity-40 shadow-sm">
+                <span class="sync-beacon"></span>
+                <span class="small text-white fw-semibold" style="font-size: 0.75rem;">
+                  <i class="bi bi-laptop me-1 text-cyan"></i> &amp; <i class="bi bi-phone me-1 text-purple"></i> Synced Live
+                </span>
+              </div>
+            </div>
+
+            <!-- Drag or Swipe Interaction Hint Pill -->
+            <div id="dragHintPill" class="position-absolute start-50 translate-middle-x z-2 drag-hint-pill" style="bottom: 58px;">
+              <span class="badge rounded-pill bg-dark bg-opacity-75 text-cyan border border-cyan border-opacity-40 px-3 py-2 shadow d-flex align-items-center gap-2">
+                <i class="bi bi-arrows-move"></i>
+                <span style="font-size: 0.76rem; font-weight: 500;">Drag or Swipe to Rotate 360°</span>
+              </span>
+            </div>
+
+            <!-- Floating Controls Toolbar -->
+            <div class="mockup-controls-bar position-absolute bottom-0 end-0 m-2 m-sm-3 d-flex align-items-center gap-1 gap-sm-2 z-2 p-1 rounded-pill glass-controls border border-secondary border-opacity-50 shadow">
+              
+              <!-- Auto-Spin Toggle -->
+              <button type="button" class="btn btn-sm btn-icon-round text-white" id="btnToggleSpin" title="Toggle 360° Auto-Spin">
+                <i class="bi bi-pause-circle-fill fs-6 text-cyan" id="spinBtnIcon"></i>
+              </button>
+
+              <!-- Preset 3D Isometric View -->
+              <button type="button" class="btn btn-sm btn-outline-cyan-subtle px-2 py-1 rounded-pill small" id="btnPresetIso" title="Reset to Isometric Angle">
+                <i class="bi bi-box me-1"></i>3D Iso
+              </button>
+
+              <!-- Preset Front View -->
+              <button type="button" class="btn btn-sm btn-outline-purple-subtle px-2 py-1 rounded-pill small d-none d-sm-inline-block" id="btnPresetFront" title="Head-on Device View">
+                <i class="bi bi-eye me-1"></i>Front
+              </button>
+
+              <!-- View Switcher (3D Model / HD Photo) -->
+              <button type="button" class="btn btn-sm btn-dark text-muted px-2 py-1 rounded-pill small border border-secondary border-opacity-40" id="btnToggleMode" title="Switch between Interactive 3D Model & HD Photo Render">
+                <span id="modeBtnText"><i class="bi bi-image me-1 text-secondary"></i>Photo</span>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Stats & Highlights Counter Strip -->
+    <div class="row g-4 mt-5 pt-4 border-top border-secondary border-opacity-25 text-center text-md-start">
+      <div class="col-6 col-md-3">
+        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+          <div class="fs-1 text-cyan"><i class="bi bi-speedometer2"></i></div>
+          <div>
+            <h3 class="h4 text-white fw-black mb-0">3 - 5 Days</h3>
+            <span class="small text-muted">Lightning Delivery</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+          <div class="fs-1 text-purple"><i class="bi bi-currency-rupee"></i></div>
+          <div>
+            <h3 class="h4 text-white fw-black mb-0">₹2,999</h3>
+            <span class="small text-muted">Budget-Friendly Plans</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+          <div class="fs-1 text-success"><i class="bi bi-phone-fill"></i></div>
+          <div>
+            <h3 class="h4 text-white fw-black mb-0">100% Mobile</h3>
+            <span class="small text-muted">Flawless on Phones</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+          <div class="fs-1 text-cyan"><i class="bi bi-whatsapp"></i></div>
+          <div>
+            <h3 class="h4 text-white fw-black mb-0">WhatsApp Sync</h3>
+            <span class="small text-muted">Instant Order Inquiries</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- =================================================================
+     02. OUR SERVICES SECTION
+     ================================================================= -->
+<section id="servicesSection" class="py-5 my-4">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-badge badge-pill-cyan">WHAT WE BUILD</span>
+      <h2 class="section-title text-white">Full-Stack Web Development Services</h2>
+      <p class="section-subtitle">
+        Everything your brand needs to succeed online — built with modern code, responsive design, and conversion-focused architecture.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      
+      <!-- Service 1: Business Websites -->
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card service-card">
+          <div>
+            <div class="service-icon-box">
+              <i class="bi bi-briefcase-fill"></i>
+            </div>
+            <h3>Business Websites</h3>
+            <p>
+              Corporate websites, local businesses, law firms, doctors, and consultancies wanting a high-trust digital presence that converts visitors.
+            </p>
+            <ul class="service-features-list">
+              <li><i class="bi bi-check-circle-fill"></i> Mobile &amp; Tablet Ready</li>
+              <li><i class="bi bi-check-circle-fill"></i> Google Maps &amp; Contact Form</li>
+              <li><i class="bi bi-check-circle-fill"></i> WhatsApp Instant Inquiry</li>
+              <li><i class="bi bi-check-circle-fill"></i> SEO-Friendly Architecture</li>
+            </ul>
+          </div>
+          <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+            <span class="text-cyan fw-bold">From ₹2,999</span>
+            <a href="{{ url_for('services') }}#business" class="text-white text-decoration-none small fw-semibold">Learn More <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service 2: E-Commerce Websites -->
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card service-card" style="border-color: rgba(0, 242, 254, 0.25);">
+          <div>
+            <div class="service-icon-box" style="background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(168, 85, 247, 0.2));">
+              <i class="bi bi-bag-heart-fill"></i>
+            </div>
+            <h3>E-Commerce Stores</h3>
+            <p>
+              Full-featured online shops for bakeries, clothing, jewelry, electronics, and local merchants with direct shopping cart and WhatsApp orders.
+            </p>
+            <ul class="service-features-list">
+              <li><i class="bi bi-check-circle-fill"></i> Product Catalog &amp; Filters</li>
+              <li><i class="bi bi-check-circle-fill"></i> WhatsApp Order Notifications</li>
+              <li><i class="bi bi-check-circle-fill"></i> UPI / Online Payment Gateway</li>
+              <li><i class="bi bi-check-circle-fill"></i> Admin Inventory Management</li>
+            </ul>
+          </div>
+          <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+            <span class="text-purple fw-bold">From ₹7,999</span>
+            <a href="{{ url_for('services') }}#ecommerce" class="text-white text-decoration-none small fw-semibold">Learn More <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service 3: Portfolio Websites -->
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card service-card">
+          <div>
+            <div class="service-icon-box">
+              <i class="bi bi-palette-fill"></i>
+            </div>
+            <h3>Portfolio Websites</h3>
+            <p>
+              Eye-catching portfolios for freelancers, photographers, designers, engineers, and models to display their work, resume, and testimonials.
+            </p>
+            <ul class="service-features-list">
+              <li><i class="bi bi-check-circle-fill"></i> Interactive Project Gallery</li>
+              <li><i class="bi bi-check-circle-fill"></i> Resume &amp; Skills Showcase</li>
+              <li><i class="bi bi-check-circle-fill"></i> Client Reviews &amp; Social Links</li>
+              <li><i class="bi bi-check-circle-fill"></i> Fast 1-Click Hiring Buttons</li>
+            </ul>
+          </div>
+          <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+            <span class="text-cyan fw-bold">From ₹2,999</span>
+            <a href="{{ url_for('services') }}#portfolio" class="text-white text-decoration-none small fw-semibold">Learn More <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service 4: Custom Web Applications -->
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card service-card">
+          <div>
+            <div class="service-icon-box">
+              <i class="bi bi-cpu-fill"></i>
+            </div>
+            <h3>Custom Web Apps</h3>
+            <p>
+              Bespoke web applications built with Python Flask, SQLite/PostgreSQL, custom dashboards, client portals, QR utilities, and SaaS MVPs.
+            </p>
+            <ul class="service-features-list">
+              <li><i class="bi bi-check-circle-fill"></i> Secure Authentication</li>
+              <li><i class="bi bi-check-circle-fill"></i> Custom Database Architecture</li>
+              <li><i class="bi bi-check-circle-fill"></i> Admin Analytics &amp; Reports</li>
+              <li><i class="bi bi-check-circle-fill"></i> Third-party API Integrations</li>
+            </ul>
+          </div>
+          <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+            <span class="text-purple fw-bold">Custom Quote</span>
+            <a href="{{ url_for('services') }}#custom" class="text-white text-decoration-none small fw-semibold">Learn More <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     03. INTERACTIVE WEBSITE COST CALCULATOR (USER FAVORITE FEATURE!)
+     ================================================================= -->
+<section id="calculatorSection" class="py-5 my-4">
+  <div class="container">
+    <div class="calculator-card" id="websiteCostCalculator">
+      
+      <div class="row g-4 align-items-center mb-4">
+        <div class="col-lg-8">
+          <span class="badge-pill-cyan mb-2">
+            <i class="bi bi-calculator-fill"></i> INSTANT PRICE ESTIMATOR
+          </span>
+          <h2 class="text-white fw-black mb-2">Interactive Website Cost Calculator</h2>
+          <p class="text-muted mb-0">
+            Customize your website requirements, see the estimated price in real-time, and get an instant breakdown ready to send on WhatsApp!
+          </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <span class="badge-pill-purple">
+            <i class="bi bi-shield-check"></i> Transparent &amp; No Hidden Fees
+          </span>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        
+        <!-- Left: Options & Customization -->
+        <div class="col-lg-7">
+          
+          <!-- Step 1: Select Website Type -->
+          <div class="mb-4">
+            <label class="form-label text-white fw-bold mb-3 d-flex align-items-center gap-2">
+              <span class="badge bg-cyan text-dark rounded-circle" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;">1</span>
+              Select Website Type
+            </label>
+            <div class="row g-3">
+              <div class="col-sm-6">
+                <div class="calc-option-box calc-type-option active" data-price="2999" data-days="4" data-name="Starter Business Website">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="fw-bold text-white">Starter Business</span>
+                    <span class="badge bg-secondary">Basic</span>
+                  </div>
+                  <p class="small text-muted mb-2">Perfect for local services, clinics &amp; consultancies.</p>
+                  <div class="text-cyan fw-bold">₹2,999</div>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="calc-option-box calc-type-option" data-price="4999" data-days="5" data-name="Professional Business Website">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="fw-bold text-white">Pro Business</span>
+                    <span class="badge bg-primary">Popular</span>
+                  </div>
+                  <p class="small text-muted mb-2">Multi-page corporate website with custom branding.</p>
+                  <div class="text-cyan fw-bold">₹4,999</div>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="calc-option-box calc-type-option" data-price="7999" data-days="7" data-name="E-Commerce Online Store">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="fw-bold text-white">E-Commerce Store</span>
+                    <span class="badge bg-success">Sales</span>
+                  </div>
+                  <p class="small text-muted mb-2">Product catalog, cart, and WhatsApp order checkout.</p>
+                  <div class="text-purple fw-bold">₹7,999</div>
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="calc-option-box calc-type-option" data-price="12999" data-days="10" data-name="Custom Web Application">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="fw-bold text-white">Custom Web App</span>
+                    <span class="badge bg-purple">Advanced</span>
+                  </div>
+                  <p class="small text-muted mb-2">Python Flask portal, SQLite/API, custom database logic.</p>
+                  <div class="text-purple fw-bold">₹12,999+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Number of Pages -->
+          <div class="mb-4">
+            <label class="form-label text-white fw-bold mb-2 d-flex align-items-center gap-2">
+              <span class="badge bg-cyan text-dark rounded-circle" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;">2</span>
+              Number of Pages
+            </label>
+            <select class="form-select form-select-custom" id="calcPages">
+              <option value="1-3" data-price="0" data-days="0" selected>1 to 3 Pages (Home, About, Contact) - Included</option>
+              <option value="4-7" data-price="1500" data-days="1">4 to 7 Pages (Services, Gallery, Reviews, FAQ) (+₹1,500)</option>
+              <option value="8-15" data-price="3500" data-days="2">8 to 15 Pages (Comprehensive Business Portal) (+₹3,500)</option>
+              <option value="15+" data-price="6000" data-days="4">15+ Pages / Custom Enterprise (+₹6,000)</option>
+            </select>
+          </div>
+
+          <!-- Step 3: Additional Features & Add-ons -->
+          <div>
+            <label class="form-label text-white fw-bold mb-2 d-flex align-items-center gap-2">
+              <span class="badge bg-cyan text-dark rounded-circle" style="width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;">3</span>
+              Optional Add-on Features
+            </label>
+
+            <div class="calc-addon-check">
+              <div class="d-flex align-items-center gap-3">
+                <input type="checkbox" class="calc-addon-input" id="addonAdmin" data-price="2000" data-days="2" data-name="Admin CMS Dashboard">
+                <div>
+                  <div class="text-white fw-semibold">Admin CMS Dashboard</div>
+                  <div class="small text-muted">Update your text, images, products, and inquiries yourself.</div>
+                </div>
+              </div>
+              <span class="badge bg-secondary text-light">+₹2,000</span>
+            </div>
+
+            <div class="calc-addon-check">
+              <div class="d-flex align-items-center gap-3">
+                <input type="checkbox" class="calc-addon-input" id="addonPayment" data-price="1500" data-days="1" data-name="Online Payment Gateway">
+                <div>
+                  <div class="text-white fw-semibold">UPI &amp; Online Payment Gateway</div>
+                  <div class="small text-muted">Accept GooglePay, PhonePe, Cards, NetBanking directly into your account.</div>
+                </div>
+              </div>
+              <span class="badge bg-secondary text-light">+₹1,500</span>
+            </div>
+
+            <div class="calc-addon-check">
+              <div class="d-flex align-items-center gap-3">
+                <input type="checkbox" class="calc-addon-input" id="addonSeo" data-price="1200" data-days="1" data-name="Advanced SEO Setup">
+                <div>
+                  <div class="text-white fw-semibold">Advanced SEO &amp; Google My Business</div>
+                  <div class="small text-muted">Rank on Google Search and Google Maps for local customers.</div>
+                </div>
+              </div>
+              <span class="badge bg-secondary text-light">+₹1,200</span>
+            </div>
+
+            <div class="calc-addon-check active">
+              <div class="d-flex align-items-center gap-3">
+                <input type="checkbox" class="calc-addon-input" id="addonWa" data-price="0" data-days="0" data-name="WhatsApp Live Sync" checked disabled>
+                <div>
+                  <div class="text-white fw-semibold">WhatsApp Live Inquiry Sync <span class="badge bg-success ms-1">INCLUDED</span></div>
+                  <div class="small text-muted">Direct click-to-chat links for 8971987220 &amp; 7821964008.</div>
+                </div>
+              </div>
+              <span class="badge bg-success text-white">FREE</span>
+            </div>
+
+            <div class="calc-addon-check active">
+              <div class="d-flex align-items-center gap-3">
+                <input type="checkbox" class="calc-addon-input" id="addonSsl" data-price="0" data-days="0" data-name="SSL & Speed Boost" checked disabled>
+                <div>
+                  <div class="text-white fw-semibold">Mobile Responsive &amp; Speed Boost <span class="badge bg-success ms-1">INCLUDED</span></div>
+                  <div class="small text-muted">High-speed CSS &amp; clean lightweight code.</div>
+                </div>
+              </div>
+              <span class="badge bg-success text-white">FREE</span>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Right: Live Summary & WhatsApp Action Box -->
+        <div class="col-lg-5">
+          <div class="calc-total-box h-100 d-flex flex-column justify-content-between">
+            <div>
+              <span class="badge-pill-cyan mb-3">YOUR ESTIMATE</span>
+              <div class="text-muted small">Total Investment</div>
+              <div class="calc-big-price" id="calcTotalPrice" data-current="2999">₹2,999</div>
+              
+              <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+                <i class="bi bi-clock-history text-cyan"></i>
+                <span class="small text-white">Estimated Delivery: <strong id="calcTotalDays" class="text-cyan">3 - 5 Days</strong></span>
+              </div>
+
+              <div class="p-3 rounded bg-dark bg-opacity-60 border border-secondary border-opacity-25 text-start mb-4">
+                <div class="small text-muted mb-1">Configuration Breakdown:</div>
+                <div id="calcSummaryText" class="small text-white">
+                  <strong>Starter Business Website</strong> with <strong>1-3 Pages</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-column gap-3">
+              <a href="#" id="calcWhatsAppBtn" target="_blank" class="btn btn-whatsapp w-100 justify-content-center py-3 fs-6">
+                <i class="bi bi-whatsapp fs-5"></i> Chat on WhatsApp with Estimate
+              </a>
+              <button type="button" id="calcFormBtn" class="btn btn-outline-glow w-100 justify-content-center py-2 text-cyan">
+                <i class="bi bi-envelope-check"></i> Fill In Inquiry Form Instead
+              </button>
+              <div class="small text-muted text-center">
+                Need customized features? Call us directly: <a href="tel:8971987220" class="text-white text-decoration-none fw-bold">8971987220</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     04. OUR PORTFOLIO SECTION
+     ================================================================= -->
+<section id="portfolioSection" class="py-5 my-4">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+      <div>
+        <span class="section-badge badge-pill-cyan">PROVEN RESULTS</span>
+        <h2 class="section-title text-white mb-1">Featured Client Projects</h2>
+        <p class="section-subtitle ms-0">
+          Explore recent websites and web applications built by AM Developers.
+        </p>
+      </div>
+      <div class="mt-3 mt-md-0">
+        <a href="{{ url_for('portfolio') }}" class="btn btn-outline-glow btn-sm">
+          View All Projects <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      {% for project in featured_projects %}
+      <div class="col-lg-4 col-md-6">
+        <div class="glass-card portfolio-card">
+          <div class="portfolio-img-box">
+            <img src="{{ project.image_url }}" alt="{{ project.title }}">
+            <div class="portfolio-overlay">
+              <a href="{{ project.live_url }}" target="_blank" class="btn btn-gradient btn-sm">
+                <i class="bi bi-eye-fill"></i> View Details
+              </a>
+            </div>
+          </div>
+          <div class="portfolio-body">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge-pill-purple py-1 px-2" style="font-size: 0.72rem;">{{ project.category }}</span>
+                <span class="small text-muted">{{ project.client }}</span>
+              </div>
+              <h4 class="text-white fw-bold mb-2">{{ project.title }}</h4>
+              <p class="small text-muted mb-3">{{ project.description }}</p>
+            </div>
+            <div>
+              <div class="mb-3">
+                {% for tag in project.tags.split(',') %}
+                  <span class="portfolio-tag">{{ tag.strip() }}</span>
+                {% endfor %}
+              </div>
+              <a href="{{ project.live_url }}" target="_blank" class="btn btn-outline-glow btn-sm w-100 text-center">
+                <i class="bi bi-whatsapp text-success me-1"></i> Inquire About This Style
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- =================================================================
+     05. AFFORDABLE PRICING SECTION
+     ================================================================= -->
+<section id="pricingSection" class="py-5 my-4">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-badge badge-pill-cyan">AFFORDABLE PACKAGES</span>
+      <h2 class="section-title text-white">Simple, Transparent Pricing</h2>
+      <p class="section-subtitle">
+        High quality web development at honest prices. Pick the plan that fits your business stage.
+      </p>
+    </div>
+
+    <div class="row g-4 align-items-stretch">
+      
+      <!-- Package 1: Starter -->
+      <div class="col-lg-4">
+        <div class="glass-card pricing-card">
+          <div>
+            <div class="d-flex justify-content-between align-items-center">
+              <h4 class="text-white fw-bold mb-0">Starter Package</h4>
+              <span class="badge bg-secondary">Basic</span>
+            </div>
+            <p class="small text-muted mt-2 mb-0">Best for small businesses, freelancers, &amp; local shops.</p>
+            
+            <div class="pricing-amount">₹2,999</div>
+            <div class="pricing-delivery">
+              <i class="bi bi-lightning-charge-fill"></i> Fast Delivery: 3 - 4 Days
+            </div>
+
+            <ul class="pricing-checklist">
+              <li><i class="bi bi-check-circle-fill"></i> 1 to 3 Responsive Pages</li>
+              <li><i class="bi bi-check-circle-fill"></i> Clean Mobile-First UI/UX</li>
+              <li><i class="bi bi-check-circle-fill"></i> WhatsApp Instant Chat Button</li>
+              <li><i class="bi bi-check-circle-fill"></i> Contact &amp; Lead Inquiry Form</li>
+              <li><i class="bi bi-check-circle-fill"></i> Google Maps Location Embed</li>
+              <li><i class="bi bi-check-circle-fill"></i> Social Media Links Sync</li>
+              <li><i class="bi bi-check-circle-fill"></i> 30 Days Free Bug Support</li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="https://wa.me/918971987220?text=Hi%20AM%20Developers,%20I%20would%20like%20to%20choose%20the%20Starter%20Package%20(₹2,999)!" target="_blank" class="btn btn-outline-glow w-100 justify-content-center">
+              Choose Starter Plan
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package 2: Professional / Growth (Featured) -->
+      <div class="col-lg-4">
+        <div class="glass-card pricing-card featured">
+          <div class="popular-badge">MOST POPULAR</div>
+          <div>
+            <div class="d-flex justify-content-between align-items-center">
+              <h4 class="text-white fw-bold mb-0">Growth / Pro</h4>
+              <span class="badge bg-cyan text-dark fw-bold">Recommended</span>
+            </div>
+            <p class="small text-muted mt-2 mb-0">Complete solution for growing businesses seeking clients.</p>
+            
+            <div class="pricing-amount text-gradient">₹5,499</div>
+            <div class="pricing-delivery text-cyan">
+              <i class="bi bi-lightning-charge-fill"></i> Fast Delivery: 4 - 5 Days
+            </div>
+
+            <ul class="pricing-checklist">
+              <li><i class="bi bi-check-circle-fill"></i> <strong>Up to 7 Custom Designed Pages</strong></li>
+              <li><i class="bi bi-check-circle-fill"></i> Modern Cyan/Purple Neon Aesthetic</li>
+              <li><i class="bi bi-check-circle-fill"></i> Interactive Quote/Cost Calculator</li>
+              <li><i class="bi bi-check-circle-fill"></i> WhatsApp Lead Routing (Dual numbers)</li>
+              <li><i class="bi bi-check-circle-fill"></i> Advanced Local SEO &amp; Meta Tags</li>
+              <li><i class="bi bi-check-circle-fill"></i> Google Search Console Integration</li>
+              <li><i class="bi bi-check-circle-fill"></i> High-Speed Performance Optimization</li>
+              <li><i class="bi bi-check-circle-fill"></i> 60 Days Priority Support</li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="https://wa.me/918971987220?text=Hi%20AM%20Developers,%20I%20would%20like%20to%20choose%20the%20Growth/Pro%20Package%20(₹5,499)!" target="_blank" class="btn btn-gradient w-100 justify-content-center py-3">
+              <i class="bi bi-whatsapp"></i> Choose Growth Plan
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package 3: E-Commerce Store -->
+      <div class="col-lg-4">
+        <div class="glass-card pricing-card">
+          <div>
+            <div class="d-flex justify-content-between align-items-center">
+              <h4 class="text-white fw-bold mb-0">E-Commerce Store</h4>
+              <span class="badge bg-purple">E-Shop</span>
+            </div>
+            <p class="small text-muted mt-2 mb-0">Sell online with automated carts and WhatsApp orders.</p>
+            
+            <div class="pricing-amount">₹9,999</div>
+            <div class="pricing-delivery">
+              <i class="bi bi-lightning-charge-fill"></i> Fast Delivery: 6 - 7 Days
+            </div>
+
+            <ul class="pricing-checklist">
+              <li><i class="bi bi-check-circle-fill"></i> Unlimited Product Showcase</li>
+              <li><i class="bi bi-check-circle-fill"></i> Interactive Shopping Cart System</li>
+              <li><i class="bi bi-check-circle-fill"></i> WhatsApp 1-Click Order Generation</li>
+              <li><i class="bi bi-check-circle-fill"></i> UPI &amp; Online Payment Gateway</li>
+              <li><i class="bi bi-check-circle-fill"></i> Admin Panel for Products &amp; Prices</li>
+              <li><i class="bi bi-check-circle-fill"></i> Customer Order Management (SQLite)</li>
+              <li><i class="bi bi-check-circle-fill"></i> Discount Coupon Codes Feature</li>
+              <li><i class="bi bi-check-circle-fill"></i> 90 Days Dedicated Support</li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="https://wa.me/918971987220?text=Hi%20AM%20Developers,%20I%20would%20like%20to%20choose%20the%20E-Commerce%20Package%20(₹9,999)!" target="_blank" class="btn btn-outline-glow w-100 justify-content-center">
+              Choose E-Commerce Plan
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Need custom quote footer banner -->
+    <div class="text-center mt-5">
+      <p class="text-muted small">
+        Need custom API integrations, mobile app conversion, or specialized backends? 
+        <a href="{{ url_for('contact') }}" class="text-cyan fw-bold text-decoration-none">Contact our team for a tailored quote</a> or call <a href="tel:7821964008" class="text-white fw-bold text-decoration-none">7821964008</a>.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- =================================================================
+     06. CLIENT TESTIMONIALS
+     ================================================================= -->
+<section class="py-5 my-4">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="section-badge badge-pill-cyan">TESTIMONIALS</span>
+      <h2 class="section-title text-white">What Our Clients Say</h2>
+      <p class="section-subtitle">
+        Real feedback from business owners who trusted AM Developers.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      
+      <!-- Review 1 -->
+      <div class="col-md-4">
+        <div class="glass-card testimonial-card">
+          <div class="d-flex align-items-center gap-1 text-warning mb-3">
+            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+          </div>
+          <p class="text-muted small mb-4">
+            "AM Developers built our online ordering store for Star Bakery in just 4 days. The WhatsApp order feature is brilliant — customers select their cake and it sends us an exact order summary directly on WhatsApp! Our sales increased immediately."
+          </p>
+          <div class="d-flex align-items-center gap-3">
+            <div class="testimonial-avatar">SB</div>
+            <div>
+              <div class="fw-bold text-white">Farhan Qureshi</div>
+              <div class="small text-cyan">Owner, Star Bakery &amp; Cafe</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review 2 -->
+      <div class="col-md-4">
+        <div class="glass-card testimonial-card" style="border-color: rgba(0, 242, 254, 0.25);">
+          <div class="d-flex align-items-center gap-1 text-warning mb-3">
+            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+          </div>
+          <p class="text-muted small mb-4">
+            "I needed a high-impact gym portal with class schedules and membership plans. AM Developers delivered beyond my expectations. The neon dark theme fits our fitness brand perfectly and the mobile speed is top notch."
+          </p>
+          <div class="d-flex align-items-center gap-3">
+            <div class="testimonial-avatar" style="background: linear-gradient(135deg, #10b981, #06b6d4);">EF</div>
+            <div>
+              <div class="fw-bold text-white">Vikram Rathore</div>
+              <div class="small text-purple">Founder, Evolve Fitness Hub</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review 3 -->
+      <div class="col-md-4">
+        <div class="glass-card testimonial-card">
+          <div class="d-flex align-items-center gap-1 text-warning mb-3">
+            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+          </div>
+          <p class="text-muted small mb-4">
+            "Affordable pricing with agency quality. What I loved most is that both founders were personally available on phone and WhatsApp (8971987220 &amp; 7821964008) whenever I had questions. Highly recommended!"
+          </p>
+          <div class="d-flex align-items-center gap-3">
+            <div class="testimonial-avatar" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">MK</div>
+            <div>
+              <div class="fw-bold text-white">Meera Kulkarni</div>
+              <div class="small text-cyan">Director, Nexus Tech Consultancy</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     07. FAQ SECTION
+     ================================================================= -->
+<section class="py-5 my-4">
+  <div class="container" style="max-width: 860px;">
+    <div class="text-center mb-5">
+      <span class="section-badge badge-pill-cyan">GOT QUESTIONS?</span>
+      <h2 class="section-title text-white">Frequently Asked Questions</h2>
+      <p class="section-subtitle">
+        Everything you need to know about working with AM Developers.
+      </p>
+    </div>
+
+    <div class="accordion accordion-custom" id="faqAccordion">
+      
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            How fast will my website be ready?
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            Our standard business websites are delivered in <strong>3 to 5 business days</strong>. E-commerce stores take around 6 to 7 days, and custom web apps take 10 to 14 days depending on complexity. We value speed and maintain constant communication on WhatsApp throughout the process.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            Do I get domain and hosting with my website?
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            Yes! We assist you in selecting and configuring high-speed cloud hosting, SSL certificates, and custom domains (e.g. yourbusiness.com or .in). You always retain 100% ownership of your domain and assets.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            How does the WhatsApp order and inquiry system work?
+          </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            Whenever a customer fills an inquiry form, calculates a price, or clicks the WhatsApp button on your website, a pre-filled, cleanly formatted WhatsApp message is opened with your company's phone number. You can instantly reply, close deals, or take orders right from your phone!
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingFour">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            How do payments work? Are there any hidden costs?
+          </button>
+        </h2>
+        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            We operate on milestone-based payments: 50% advance to initiate design &amp; development, and the remaining 50% only after you review and approve the finished website. There are absolutely no hidden fees.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingFive">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+            Can I manage and update content on my website later?
+          </button>
+        </h2>
+        <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            Yes! For websites with CMS or Admin panels, we provide a secure, intuitive dashboard where you can edit text, change pricing, view inquiries, and upload new photos without any programming knowledge.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     08. CALL TO ACTION & QUICK INQUIRY STRIP
+     ================================================================= -->
+<section id="contactSection" class="py-5 my-4 position-relative">
+  <div class="container">
+    <div class="glass-card p-4 p-lg-5" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 27, 75, 0.95) 100%); border-color: var(--cyan-primary);">
+      <div class="row g-5 align-items-center">
+        
+        <div class="col-lg-6">
+          <span class="badge-pill-cyan mb-3">GET IN TOUCH TODAY</span>
+          <h2 class="text-white fw-black mb-3">Ready to Launch Your Business Online?</h2>
+          <p class="text-muted mb-4">
+            Fill in the quick requirements form or connect directly with our founders on WhatsApp. We typically reply within 15 minutes!
+          </p>
+
+          <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-cyan bg-opacity-10 text-cyan rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                <i class="bi bi-telephone-fill fs-5"></i>
+              </div>
+              <div>
+                <div class="small text-muted">Primary Contact Line</div>
+                <a href="tel:8971987220" class="text-white fw-bold text-decoration-none fs-5">8971987220</a>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-purple bg-opacity-10 text-purple rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                <i class="bi bi-telephone-fill fs-5"></i>
+              </div>
+              <div>
+                <div class="small text-muted">Secondary Founder Line</div>
+                <a href="tel:7821964008" class="text-white fw-bold text-decoration-none fs-5">7821964008</a>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                <i class="bi bi-whatsapp fs-5"></i>
+              </div>
+              <div>
+                <div class="small text-muted">WhatsApp Inquiry Link</div>
+                <a href="https://wa.me/918971987220?text=Hi%20AM%20Developers,%20I'd%20like%20to%20get%20started%20on%20my%20website" target="_blank" class="text-success fw-bold text-decoration-none fs-5">Direct WhatsApp Chat</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="p-4 rounded-4 bg-dark bg-opacity-75 border border-secondary border-opacity-25">
+            <h4 class="text-white fw-bold mb-3">Send Project Inquiry</h4>
+            <form action="{{ url_for('submit_inquiry') }}" method="POST">
+              <input type="hidden" name="source" value="Homepage Quick Form">
+              
+              <div class="mb-3">
+                <label class="form-label-custom">Your Name *</label>
+                <input type="text" name="name" class="form-control form-control-custom" placeholder="e.g. Ramesh Patel" required>
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label-custom">Phone / WhatsApp *</label>
+                  <input type="tel" name="phone" class="form-control form-control-custom" placeholder="e.g. 9845012345" required>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label-custom">Email Address</label>
+                  <input type="email" name="email" class="form-control form-control-custom" placeholder="name@business.com">
+                </div>
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label-custom">Service Needed</label>
+                  <input type="text" name="service" id="serviceField" class="form-control form-control-custom" placeholder="e.g. Business Website">
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label-custom">Estimated Budget</label>
+                  <input type="text" name="budget" id="budgetField" class="form-control form-control-custom" placeholder="e.g. ₹2,999 - ₹5,000">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-custom">Project Brief / Message</label>
+                <textarea name="message" id="messageField" rows="3" class="form-control form-control-custom" placeholder="Briefly describe what kind of website you are looking for..."></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-gradient w-100 justify-content-center py-3">
+                <i class="bi bi-send-fill"></i> Submit Project Inquiry
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Three.js (WebGL 3D Engine) + OrbitControls -->
+<script src="{{ url_for('static', filename='js/vendor/three.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/vendor/OrbitControls.js') }}"></script>
+<!-- 360° Interactive Device Showcase Engine -->
+<script src="{{ url_for('static', filename='js/mockup-360.js') }}"></script>
+{% endblock %}

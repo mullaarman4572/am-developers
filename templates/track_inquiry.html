@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Track Your Inquiry & View Updates | AM Developers{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 text-center position-relative">
+  <div class="container py-4">
+    <span class="section-badge badge-pill-cyan mb-3">CUSTOMER PORTAL</span>
+    <h1 class="text-white fw-black display-5 mb-3">Track Your Project Inquiry</h1>
+    <p class="text-muted fs-5 mx-auto" style="max-width: 720px;">
+      Check the status of your website inquiry, view all email messages and quotes sent to you by our founders, and reply directly.
+    </p>
+  </div>
+</section>
+
+<div class="container pb-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+
+      <!-- Lookup Bar -->
+      <div class="glass-card p-4 p-md-5 mb-5" style="border-color: rgba(0, 242, 254, 0.35);">
+        <h4 class="text-white fw-bold mb-2">Look Up Your Inquiry</h4>
+        <p class="text-muted small mb-4">Enter your <strong>Email Address</strong>, <strong>Phone Number</strong>, or <strong>Inquiry Reference #ID</strong> to find your project thread:</p>
+
+        <form action="{{ url_for('track_inquiry') }}" method="GET" class="row g-3 align-items-center">
+          <div class="col-md-9">
+            <div class="input-group">
+              <span class="input-group-text bg-dark border-secondary border-opacity-50 text-cyan">
+                <i class="bi bi-search"></i>
+              </span>
+              <input type="text" name="query" class="form-control form-control-custom py-2" placeholder="e.g. name@company.com or 9845012345 or #1002" value="{{ search_query or '' }}" required>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-gradient w-100 py-2">
+              <i class="bi bi-arrow-right-circle me-1"></i> Track Inquiry
+            </button>
+          </div>
+        </form>
+
+        {% if is_new %}
+        <div class="alert alert-custom-success mt-4 mb-0 d-flex align-items-center gap-2">
+          <i class="bi bi-check-circle-fill text-success fs-5"></i>
+          <div>
+            <strong>Inquiry Successfully Received!</strong> Your reference ID is <strong>#{{ current_inquiry.id if current_inquiry else '' }}</strong>. Bookmark this page to check updates anytime.
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Multiple Inquiries Match Results -->
+      {% if matching_inquiries and matching_inquiries|length > 1 %}
+      <div class="glass-card p-4 mb-5">
+        <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="bi bi-collection-fill text-cyan"></i> Inquiries Found for "{{ search_query }}" ({{ matching_inquiries|length }})
+        </h5>
+        <div class="table-responsive">
+          <table class="table table-dark table-borderless align-middle mb-0" style="background: transparent;">
+            <thead>
+              <tr class="border-bottom border-secondary border-opacity-25 small text-muted">
+                <th>REF #</th>
+                <th>DATE</th>
+                <th>SERVICE</th>
+                <th>BUDGET</th>
+                <th>STATUS</th>
+                <th>MESSAGES</th>
+                <th class="text-end">ACTION</th>
+              </tr>
+            </thead>
+            <tbody class="small">
+              {% for inq in matching_inquiries %}
+              <tr class="border-bottom border-secondary border-opacity-10">
+                <td><strong class="text-cyan">#{{ inq.id }}</strong></td>
+                <td class="text-muted">{{ inq.created_at[:10] if inq.created_at else 'Recent' }}</td>
+                <td class="text-white fw-semibold">{{ inq.service or 'Web Project' }}</td>
+                <td><span class="badge bg-secondary">{{ inq.budget or 'Flexible' }}</span></td>
+                <td>
+                  {% if inq.status == 'New' %}
+                    <span class="badge bg-danger">New</span>
+                  {% elif inq.status == 'Contacted' %}
+                    <span class="badge bg-warning text-dark">In Review</span>
+                  {% elif inq.status == 'Converted' %}
+                    <span class="badge bg-success">In Progress</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Closed</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge bg-info bg-opacity-25 text-cyan border border-info border-opacity-50">
+                    <i class="bi bi-chat-dots-fill me-1"></i> {{ inq.message_count }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <a href="{{ url_for('track_inquiry', inquiry_id=inq.id) }}" class="btn btn-sm btn-outline-glow">
+                    View Thread &rarr;
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Active Inquiry Details & Conversation Thread -->
+      {% if current_inquiry %}
+      <div class="glass-card p-4 p-md-5 mb-4" style="border-color: rgba(157, 78, 221, 0.4);">
+        
+        <!-- Header & Status Pill -->
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 pb-3 mb-4 border-bottom border-secondary border-opacity-25">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge-pill-cyan">INQUIRY REF #{{ current_inquiry.id }}</span>
+              <span class="text-muted small">&bull; Submitted {{ current_inquiry.created_at[:16] if current_inquiry.created_at else 'Recently' }}</span>
+            </div>
+            <h3 class="text-white fw-black mb-1">{{ current_inquiry.service or 'Custom Web Development' }}</h3>
+            <div class="text-muted small">Client Name: <strong class="text-white">{{ current_inquiry.name }}</strong> | Phone: <strong class="text-white">{{ current_inquiry.phone }}</strong> {% if current_inquiry.email %}| Email: <strong class="text-cyan">{{ current_inquiry.email }}</strong>{% endif %}</div>
+          </div>
+          <div>
+            {% if current_inquiry.status == 'New' %}
+              <div class="badge bg-danger fs-6 px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-clock-history me-1"></i> Status: Received (New)
+              </div>
+            {% elif current_inquiry.status == 'Contacted' %}
+              <div class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-chat-dots-fill me-1"></i> Status: Under Review / In Discussion
+              </div>
+            {% elif current_inquiry.status == 'Converted' %}
+              <div class="badge bg-success fs-6 px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-check-circle-fill me-1"></i> Status: In Development / Converted
+              </div>
+            {% else %}
+              <div class="badge bg-secondary fs-6 px-3 py-2 rounded-pill shadow-sm">
+                <i class="bi bi-archive-fill me-1"></i> Status: Closed
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Visual Status Stepper -->
+        <div class="p-3 mb-4 rounded-3 bg-dark bg-opacity-75 border border-secondary border-opacity-25">
+          <div class="d-flex justify-content-between text-center position-relative">
+            <div class="d-flex flex-column align-items-center flex-fill">
+              <div class="rounded-circle d-flex align-items-center justify-content-center bg-cyan text-dark fw-bold mb-2 shadow-sm" style="width: 36px; height: 36px;">
+                <i class="bi bi-check-lg"></i>
+              </div>
+              <span class="small text-cyan fw-bold">1. Received</span>
+            </div>
+            <div class="d-flex flex-column align-items-center flex-fill">
+              <div class="rounded-circle d-flex align-items-center justify-content-center {% if current_inquiry.status in ['Contacted', 'Converted'] %}bg-cyan text-dark fw-bold{% else %}bg-secondary text-light{% endif %} mb-2" style="width: 36px; height: 36px;">
+                {% if current_inquiry.status in ['Contacted', 'Converted'] %}<i class="bi bi-check-lg"></i>{% else %}2{% endif %}
+              </div>
+              <span class="small {% if current_inquiry.status in ['Contacted', 'Converted'] %}text-cyan fw-bold{% else %}text-muted{% endif %}">2. Under Review</span>
+            </div>
+            <div class="d-flex flex-column align-items-center flex-fill">
+              <div class="rounded-circle d-flex align-items-center justify-content-center {% if current_inquiry.status in ['Contacted', 'Converted'] %}bg-cyan text-dark fw-bold{% else %}bg-secondary text-light{% endif %} mb-2" style="width: 36px; height: 36px;">
+                {% if current_inquiry.status in ['Contacted', 'Converted'] %}<i class="bi bi-chat-quote-fill"></i>{% else %}3{% endif %}
+              </div>
+              <span class="small {% if current_inquiry.status in ['Contacted', 'Converted'] %}text-cyan fw-bold{% else %}text-muted{% endif %}">3. Contact &amp; Quote</span>
+            </div>
+            <div class="d-flex flex-column align-items-center flex-fill">
+              <div class="rounded-circle d-flex align-items-center justify-content-center {% if current_inquiry.status == 'Converted' %}bg-success text-white fw-bold{% else %}bg-secondary text-light{% endif %} mb-2" style="width: 36px; height: 36px;">
+                {% if current_inquiry.status == 'Converted' %}<i class="bi bi-rocket-takeoff-fill"></i>{% else %}4{% endif %}
+              </div>
+              <span class="small {% if current_inquiry.status == 'Converted' %}text-success fw-bold{% else %}text-muted{% endif %}">4. Development</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project Details Accordion / Box -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <div class="p-3 rounded bg-dark bg-opacity-60 border border-secondary border-opacity-25 h-100">
+              <div class="text-muted small mb-1">Service &amp; Package</div>
+              <div class="text-white fw-bold fs-6">{{ current_inquiry.service or 'Custom Web Development' }}</div>
+              <div class="text-purple small fw-semibold mt-1">Estimated Budget: {{ current_inquiry.budget or 'Flexible' }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 rounded bg-dark bg-opacity-60 border border-secondary border-opacity-25 h-100">
+              <div class="text-muted small mb-1">Direct Founder Assistance</div>
+              <div class="text-white fw-semibold small mb-2">Speak with our technical leads anytime:</div>
+              <div class="d-flex gap-2">
+                <a href="https://wa.me/918971987220?text=Hi%20AM%20Developers,%20I'm%20tracking%20Inquiry%20%23{{ current_inquiry.id }}" target="_blank" class="btn btn-sm btn-whatsapp">
+                  <i class="bi bi-whatsapp me-1"></i> WhatsApp
+                </a>
+                <a href="tel:8971987220" class="btn btn-sm btn-outline-glow">
+                  <i class="bi bi-telephone-fill me-1"></i> Call 8971987220
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if current_inquiry.message %}
+        <div class="mb-4">
+          <label class="form-label text-muted small fw-bold mb-2">YOUR INITIAL PROJECT BRIEF</label>
+          <div class="p-3 rounded bg-dark bg-opacity-75 border border-secondary border-opacity-25 text-light small" style="white-space: pre-wrap;">{{ current_inquiry.message }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Messages Section: Sent to customer's email and visible here -->
+        <div class="mt-5 pt-3 border-top border-secondary border-opacity-25">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <span class="badge-pill-purple mb-1">LIVE MESSAGES &amp; EMAIL UPDATES</span>
+              <h4 class="text-white fw-bold mb-0">Communication Thread ({{ inquiry_messages|length }})</h4>
+            </div>
+            <span class="badge bg-secondary bg-opacity-50 text-cyan small border border-info border-opacity-25 px-3 py-2">
+              <i class="bi bi-envelope-check-fill me-1"></i> Messages sent to your email are visible here
+            </span>
+          </div>
+
+          <!-- Messages List -->
+          <div class="d-flex flex-column gap-3 mb-4">
+            {% for msg in inquiry_messages %}
+              {% if msg.sender == 'admin' %}
+                <!-- Admin Message (Sent to customer's email) -->
+                <div class="p-4 rounded-3 border border-info border-opacity-30" style="background: rgba(10, 15, 36, 0.95); box-shadow: 0 4px 20px rgba(0, 242, 254, 0.08);">
+                  <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="bg-cyan text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                        AM
+                      </div>
+                      <div>
+                        <span class="text-white fw-bold">{{ msg.sender_name or 'AM Developers Founder Team' }}</span>
+                        <span class="badge bg-info bg-opacity-20 text-cyan border border-info border-opacity-25 ms-2 small">
+                          <i class="bi bi-envelope-at-fill me-1"></i> Sent to {{ msg.recipient_email or current_inquiry.email }}
+                        </span>
+                      </div>
+                    </div>
+                    <span class="text-muted small"><i class="bi bi-clock me-1"></i>{{ msg.created_at[:16] if msg.created_at else 'Recent' }}</span>
+                  </div>
+
+                  {% if msg.subject %}
+                    <h6 class="text-cyan fw-bold mt-2 mb-2">{{ msg.subject }}</h6>
+                  {% endif %}
+
+                  <div class="text-light p-3 rounded bg-dark bg-opacity-60 border border-secondary border-opacity-15 small" style="white-space: pre-wrap; line-height: 1.65;">{{ msg.message }}</div>
+                </div>
+              {% else %}
+                <!-- Customer Reply Message -->
+                <div class="p-4 rounded-3 border border-secondary border-opacity-30 ms-md-4" style="background: rgba(22, 33, 62, 0.7);">
+                  <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="bg-purple text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                        YOU
+                      </div>
+                      <div>
+                        <span class="text-white fw-bold">{{ current_inquiry.name }}</span>
+                        <span class="badge bg-secondary ms-2 small">Client Note</span>
+                      </div>
+                    </div>
+                    <span class="text-muted small"><i class="bi bi-clock me-1"></i>{{ msg.created_at[:16] if msg.created_at else 'Recent' }}</span>
+                  </div>
+                  <div class="text-light p-3 rounded bg-dark bg-opacity-50 border border-secondary border-opacity-10 small" style="white-space: pre-wrap; line-height: 1.65;">{{ msg.message }}</div>
+                </div>
+              {% endif %}
+            {% else %}
+              <div class="text-center py-5 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                <i class="bi bi-inbox-fill fs-1 text-secondary d-block mb-2"></i>
+                <h6 class="text-white fw-bold">No Messages Yet</h6>
+                <p class="text-muted small mb-0 mx-auto" style="max-width: 480px;">
+                  Our founders are reviewing your project requirements. As soon as an email message or quote is sent to you, it will immediately appear right here!
+                </p>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Customer Reply Form -->
+          <div class="p-4 rounded-3 bg-dark bg-opacity-75 border border-secondary border-opacity-30">
+            <h5 class="text-white fw-bold mb-2">Send a Message or Reply to AM Developers</h5>
+            <p class="text-muted small mb-3">Need to share more requirements, links, or follow up? Write your note below and our team will receive it immediately.</p>
+
+            <form action="{{ url_for('customer_inquiry_reply', inquiry_id=current_inquiry.id) }}" method="POST">
+              <div class="mb-3">
+                <textarea name="reply_message" rows="3" class="form-control form-control-custom" placeholder="Type your message or question here..." required></textarea>
+              </div>
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span class="small text-muted">
+                  <i class="bi bi-shield-check text-cyan me-1"></i> Your reply will be directly logged into this project thread.
+                </span>
+                <button type="submit" class="btn btn-gradient px-4">
+                  <i class="bi bi-send-fill me-1"></i> Post Reply
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+      {% elif search_query and not matching_inquiries %}
+      <div class="glass-card p-5 text-center">
+        <i class="bi bi-search fs-1 text-secondary d-block mb-3"></i>
+        <h4 class="text-white fw-bold mb-2">No Inquiries Found</h4>
+        <p class="text-muted small mx-auto mb-4" style="max-width: 480px;">
+          We couldn't find any inquiries matching <strong>"{{ search_query }}"</strong>. Please check that you entered the correct email address or phone number used when submitting.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="{{ url_for('contact') }}" class="btn btn-gradient">
+            <i class="bi bi-pencil-square me-1"></i> Submit a New Inquiry
+          </a>
+          <a href="https://wa.me/918971987220?text=Hello%20AM%20Developers,%20I'm%20trying%20to%20find%20my%20inquiry" target="_blank" class="btn btn-whatsapp">
+            <i class="bi bi-whatsapp me-1"></i> Ask on WhatsApp
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}
