@@ -4,8 +4,12 @@ from flask import (
     Flask, render_template, request, redirect,
     url_for, flash, session, jsonify
 )
+from dotenv import load_dotenv
 import database
 import email_service
+
+# Load environment variables from .env
+load_dotenv()
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -38,7 +42,8 @@ def inject_global_data():
         'phone_secondary': '7821964008',
         'email_primary': 'contact@amdevelopers.in',
         'current_year': 2026,
-        'inquiry_stats': inquiry_stats
+        'inquiry_stats': inquiry_stats,
+        'smtp_configured': email_service.is_smtp_configured()
     }
 
 # ==========================================
@@ -300,13 +305,17 @@ def admin_send_message(inquiry_id):
         conn.close()
         inquiry = database.get_inquiry(inquiry_id)
 
-    # Send the email via email service
-    success, info_msg, email_status = email_service.send_inquiry_reply(
-        inquiry=inquiry,
-        subject=subject or f"Regarding your inquiry #{inquiry_id} - AM Developers",
-        message_text=message_body,
-        base_url=request.host_url
-    )
+    # Send the email via email service safely
+    try:
+        success, info_msg, email_status = email_service.send_inquiry_reply(
+            inquiry=inquiry,
+            subject=subject or f"Regarding your inquiry #{inquiry_id} - AM Developers",
+            message_text=message_body,
+            base_url=request.host_url
+        )
+    except Exception as e:
+        print(f"[ADMIN SEND MESSAGE ERROR] Exception in send_inquiry_reply: {e}")
+        success, info_msg, email_status = False, f"Email delivery failed: {e}", "failed"
 
     # Store the message in database so it is visible to the customer and admin
     database.add_inquiry_message(
@@ -326,7 +335,14 @@ def admin_send_message(inquiry_id):
     elif inquiry['status'] == 'New':
         database.update_inquiry_status(inquiry_id, 'Contacted')
 
-    flash(f'Message sent to {recipient_email}! It is now visible to the customer on their portal and in the inquiry thread.', 'success')
+    if email_service.is_smtp_configured():
+        if success:
+            flash(f'Email delivered to {recipient_email} and saved to customer tracking portal!', 'success')
+        else:
+            flash(f'Message saved to portal, but email delivery to {recipient_email} failed: {info_msg}', 'warning')
+    else:
+        flash(f'Message saved to inquiry portal & thread! (Notice: Real email was not delivered because SMTP server is not configured in .env).', 'warning')
+
     return redirect(request.referrer or url_for('admin_inquiries'))
 
 @app.route('/admin/inquiries/update-status/<int:inquiry_id>', methods=['POST'])

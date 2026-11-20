@@ -3,17 +3,31 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
+from dotenv import load_dotenv
 
-# Email Configuration from Environment
-SMTP_HOST = os.environ.get('SMTP_HOST', os.environ.get('SMTP_SERVER', ''))
-SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
-SMTP_USER = os.environ.get('SMTP_USER', os.environ.get('SMTP_USERNAME', ''))
-SMTP_PASS = os.environ.get('SMTP_PASS', os.environ.get('SMTP_PASSWORD', ''))
-SMTP_USE_TLS = os.environ.get('SMTP_USE_TLS', 'true').lower() in ('true', '1', 'yes')
-MAIL_SENDER = os.environ.get('MAIL_SENDER', 'AM Developers <contact@amdevelopers.in>')
+# Load .env variables if present
+load_dotenv()
+
+def get_smtp_config():
+    """Dynamically reads SMTP settings from environment or .env"""
+    try:
+        load_dotenv(override=True)
+    except Exception:
+        pass
+    host = os.environ.get('SMTP_HOST', os.environ.get('SMTP_SERVER', '')).strip()
+    port = int(os.environ.get('SMTP_PORT', 587))
+    user = os.environ.get('SMTP_USER', os.environ.get('SMTP_USERNAME', '')).strip()
+    password = os.environ.get('SMTP_PASS', os.environ.get('SMTP_PASSWORD', '')).strip()
+    # If Gmail App Password, remove spaces (e.g. "abcd efgh ijkl mnop" -> "abcdefghijklmnop")
+    if 'gmail' in host.lower() and password:
+        password = password.replace(' ', '')
+    use_tls = os.environ.get('SMTP_USE_TLS', 'true').lower() in ('true', '1', 'yes')
+    sender = os.environ.get('MAIL_SENDER', f'AM Developers <{user}>' if user else 'AM Developers <contact@amdevelopers.in>').strip()
+    return host, port, user, password, use_tls, sender
 
 def is_smtp_configured():
-    return bool(SMTP_HOST and SMTP_USER)
+    host, _, user, _, _, _ = get_smtp_config()
+    return bool(host and user)
 
 def send_email(to_email, subject, html_body, text_body=None):
     """
@@ -24,10 +38,12 @@ def send_email(to_email, subject, html_body, text_body=None):
     if not to_email or '@' not in to_email:
         return False, "Invalid or missing recipient email address.", "failed"
 
+    host, port, user, password, use_tls, sender = get_smtp_config()
+
     # Always prepare MIME message
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
-    msg['From'] = MAIL_SENDER
+    msg['From'] = sender
     msg['To'] = to_email
     msg['Date'] = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S +0000")
 
@@ -39,19 +55,19 @@ def send_email(to_email, subject, html_body, text_body=None):
     # If SMTP is configured, attempt real delivery
     if is_smtp_configured():
         try:
-            if SMTP_PORT == 465:
-                server = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=12)
+            if port == 465:
+                server = smtplib.SMTP_SSL(host, port, timeout=12)
             else:
-                server = smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=12)
-                if SMTP_USE_TLS:
+                server = smtplib.SMTP(host, port, timeout=12)
+                if use_tls:
                     server.starttls()
 
-            if SMTP_USER and SMTP_PASS:
-                server.login(SMTP_USER, SMTP_PASS)
+            if user and password:
+                server.login(user, password)
 
-            server.sendmail(MAIL_SENDER, [to_email], msg.as_string())
+            server.sendmail(sender, [to_email], msg.as_string())
             server.quit()
-            print(f"[EMAIL SERVICE] Successfully sent email to {to_email} via {SMTP_HOST}")
+            print(f"[EMAIL SERVICE] Successfully sent email to {to_email} via {host}")
             return True, f"Email delivered to {to_email} via SMTP server.", "sent"
         except Exception as e:
             err_msg = str(e)
@@ -62,23 +78,62 @@ def send_email(to_email, subject, html_body, text_body=None):
         # Development / Local fallback: simulated delivery
         print("="*60)
         print(f"[EMAIL SIMULATION] To: {to_email} | Subject: {subject}")
-        print(f"[EMAIL SENDER] {MAIL_SENDER}")
+        print(f"[EMAIL SENDER] {sender}")
         if text_body:
             print(f"[EMAIL BODY]\n{text_body}")
         print("="*60)
         return True, f"Message saved & logged. (SMTP server not set; message is live in customer inquiry portal).", "sent"
+
+def get_base_url(request_host_url=None):
+    """
+    Determines the best publicly reachable or network base URL for email links.
+    1. Checks SITE_URL in .env (e.g. https://amdevelopers.in or custom domain/tunnel)
+    2. If request_host_url is provided and NOT localhost/127.0.0.1, use it.
+    3. For local development, automatically uses the machine's Wi-Fi / LAN IP
+       (e.g. http://10.55.200.78:5000) so links clicked on mobile phones on the same Wi-Fi work!
+    """
+    env_site_url = os.environ.get('SITE_URL', '').strip()
+    if env_site_url:
+        return env_site_url.rstrip('/')
+
+    if request_host_url:
+        clean = request_host_url.rstrip('/')
+        if '127.0.0.1' not in clean and 'localhost' not in clean:
+            return clean
+
+    # Detect Wi-Fi / LAN IP so mobile phones on the same network can access the local server
+    try:
+        import socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        lan_ip = s.getsockname()[0]
+        s.close()
+        port = int(os.environ.get('PORT', 5000))
+        return f"http://{lan_ip}:{port}"
+    except Exception:
+        pass
+
+    return (request_host_url or 'http://127.0.0.1:5000').rstrip('/')
 
 def send_inquiry_reply(inquiry, subject, message_text, base_url):
     """
     Constructs and sends a branded reply email to a customer regarding their inquiry.
     Also provides a direct tracking link so the customer can view this and future updates online.
     """
-    to_email = inquiry['email']
-    customer_name = inquiry['name']
-    inquiry_id = inquiry['id']
+    if not inquiry:
+        return False, "Inquiry details not found.", "failed"
+    try:
+        inquiry = dict(inquiry)
+    except Exception:
+        pass
+
+    to_email = inquiry.get('email')
+    customer_name = inquiry.get('name', 'Client')
+    inquiry_id = inquiry.get('id')
     service_name = inquiry.get('service') or 'Web Development Project'
 
-    track_url = f"{base_url.rstrip('/')}/track-inquiry?inquiry_id={inquiry_id}"
+    resolved_base_url = get_base_url(base_url)
+    track_url = f"{resolved_base_url}/track-inquiry?inquiry_id={inquiry_id}"
 
     plain_text = f"""Hello {customer_name},
 
@@ -146,12 +201,16 @@ https://amdevelopers.in
         <div><span style="color: #94a3b8;">Budget:</span> <strong style="color: #a855f7;">{inquiry.get('budget', 'Flexible')}</strong></div>
       </div>
 
-      <a href="{track_url}" class="btn-portal">
-        &rarr; View &amp; Track Your Inquiry Online
-      </a>
-      <p style="font-size: 13px; color: #94a3b8; text-align: center;">
-        You can also reply to this email or send messages directly through your customer tracking portal.
-      </p>
+      <!-- Button with tracking link -->
+      <table border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto 20px; width: 100%; max-width: 440px;">
+        <tr>
+          <td align="center" style="background: linear-gradient(135deg, #00f2fe 0%, #9d4edd 100%); background-color: #00f2fe; border-radius: 8px; padding: 14px 24px; text-align: center;">
+            <a href="{track_url}" target="_blank" style="display: block; color: #ffffff !important; text-decoration: none !important; font-weight: 700; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              &rarr; View &amp; Track Your Inquiry Online
+            </a>
+          </td>
+        </tr>
+      </table>
     </div>
     <div class="footer">
       <p style="margin: 0 0 6px;">Direct Founder Contact: <a href="tel:8971987220">8971987220</a> / <a href="tel:7821964008">7821964008</a></p>
@@ -169,14 +228,22 @@ def send_inquiry_confirmation(inquiry, base_url):
     """
     Sends an instant confirmation email to customer upon submitting a new inquiry.
     """
+    if not inquiry:
+        return False, "No email provided by customer.", "none"
+    try:
+        inquiry = dict(inquiry)
+    except Exception:
+        pass
+
     to_email = inquiry.get('email')
     if not to_email:
         return False, "No email provided by customer.", "none"
 
     customer_name = inquiry.get('name', 'Valued Client')
-    inquiry_id = inquiry['id']
+    inquiry_id = inquiry.get('id')
     service_name = inquiry.get('service') or 'Web Development Project'
-    track_url = f"{base_url.rstrip('/')}/track-inquiry?inquiry_id={inquiry_id}"
+    resolved_base_url = get_base_url(base_url)
+    track_url = f"{resolved_base_url}/track-inquiry?inquiry_id={inquiry_id}"
 
     subject = f"Inquiry Received #{inquiry_id}: {service_name} | AM Developers"
 
@@ -233,11 +300,16 @@ Calls/WhatsApp: +91 8971987220 / +91 7821964008
         <div><strong>Status:</strong> <span style="color: #10b981; font-weight: 600;">Received / Under Review</span></div>
       </div>
 
-      <a href="{track_url}" class="btn">&rarr; View &amp; Track Your Inquiry Online</a>
-
-      <p style="font-size: 13px; color: #94a3b8;">
-        Whenever we send an email update or message regarding your inquiry, it will also appear live on your inquiry tracking page.
-      </p>
+      <!-- Button with tracking link -->
+      <table border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto 20px; width: 100%; max-width: 440px;">
+        <tr>
+          <td align="center" style="background: linear-gradient(135deg, #00f2fe 0%, #9d4edd 100%); background-color: #00f2fe; border-radius: 8px; padding: 14px 24px; text-align: center;">
+            <a href="{track_url}" target="_blank" style="display: block; color: #ffffff !important; text-decoration: none !important; font-weight: 700; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+              &rarr; View &amp; Track Your Inquiry Online
+            </a>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 </body>

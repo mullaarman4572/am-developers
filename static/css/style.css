@@ -1025,3 +1025,39 @@ body {
   }
 }
 
+/* ===================================================================
+   Modals & Stacking Context Reliability
+   =================================================================== */
+.modal {
+  z-index: 1055 !important;
+}
+
+.modal-backdrop {
+  z-index: 1050 !important;
+}
+
+.modal-dialog {
+  z-index: 1056 !important;
+}
+
+.modal-content.glass-card,
+.modal-content {
+  background-color: #0b1329 !important;
+  background: #0b1329 !important;
+  border-radius: var(--radius-lg);
+  transform: none !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 242, 254, 0.2);
+}
+
+.modal-content.glass-card:hover,
+.modal-content:hover {
+  transform: none !important;
+  border-color: var(--border-glow);
+}
+
+/* Ensure floating buttons never overlay on active modals or capture clicks */
+body.modal-open .floating-whatsapp-btn {
+  display: none !important;
+}
+
+
